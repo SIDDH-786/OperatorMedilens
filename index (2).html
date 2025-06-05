@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLens - Operator Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f3f4f6;
+        }
+        .logo-text {
+            font-family: 'Pacifico', cursive;
+            background: linear-gradient(90deg, #4f46e5, #959295);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            color: white;
+            border-radius: 9999px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-indigo-800 text-white py-4 shadow-lg">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+                <h1 class="text-2xl font-bold logo-text">MediLens Operator</h1>
+            </div>
+            <button id="logoutBtn" class="btn-primary">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Kendra Info Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8 glass-effect">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Your Kendra Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-gray-600"><span class="font-semibold">Kendra Code:</span> <span id="kendraCode">PMBJK02453</span></p>
+                        <p class="text-gray-600"><span class="font-semibold">Operator Name:</span> <span id="operatorName">Sujeet Kumar Mishra</span></p>
+                        <p class="text-gray-600"><span class="font-semibold">Contact:</span> <span id="operatorContact">8887959431</span></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600"><span class="font-semibold">Address:</span> <span id="kendraAddress">Jan Aushadni Medical Store, Kidwai Nagar, Kanpur Nagar (UP) 208011</span></p>
+                        <p class="text-gray-600"><span class="font-semibold">Pin Code:</span> <span id="kendraPinCode">208011</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medicine Availability Management -->
+            <div class="bg-white rounded-xl shadow-lg p-6 glass-effect">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Medicine Availability</h2>
+                    <div class="relative">
+                        <input type="text" id="medicineSearch" placeholder="Search medicines..." class="border border-gray-300 rounded-full px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <svg class="absolute right-3 top-2.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-gray-800">
+                        <thead class="bg-indigo-100">
+                            <tr>
+                                <th class="p-3 text-left">Medicine Name</th>
+                                <th class="p-3 text-left">Generic Price</th>
+                                <th class="p-3 text-left">Availability</th>
+                                <th class="p-3 text-left">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="medicineAvailabilityTable" class="divide-y divide-gray-200">
+                            <!-- Medicine rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6 flex justify-between items-center">
+                    <div>
+                        <button id="saveChangesBtn" class="btn-primary">Save Changes</button>
+                        <span id="saveStatus" class="ml-3 text-sm text-gray-600"></span>
+                    </div>
+                    <button id="addNewMedicineBtn" class="text-indigo-600 hover:text-indigo-800 font-medium">+ Add New Medicine</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Medicine Modal -->
+    <div id="addMedicineModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Add New Medicine</h3>
+                <button id="closeAddMedicineModal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="newMedicineName" class="block text-sm font-medium text-gray-700 mb-1">Medicine Name</label>
+                    <input type="text" id="newMedicineName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="newMedicinePrice" class="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                    <input type="number" id="newMedicinePrice" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                    <div class="flex items-center space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="newMedicineAvailability" value="available" class="text-indigo-600" checked>
+                            <span class="ml-2">Available</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="newMedicineAvailability" value="unavailable" class="text-indigo-600">
+                            <span class="ml-2">Not Available</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button id="cancelAddMedicine" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">Cancel</button>
+                <button id="confirmAddMedicine" class="btn-primary">Add Medicine</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - in a real app, this would come from your database/API
+        const kendraInfo = {
+            kendraCode: "PMBJK02453",
+            operatorName: "Sujeet Kumar Mishra",
+            operatorContact: "8887959431",
+            kendraAddress: "Jan Aushadni Medical Store, Kidwai Nagar, Kanpur Nagar (UP) 208011",
+            pinCode: "208011"
+        };
+
+        // Sample medicine data - in a real app, this would come from your database/API
+        let medicines = [
+            { name: "Paracetamol Tablets IP 500mg", price: 7.00, available: true },
+            { name: "Ibuprofen Tablets IP 200mg", price: 3.00, available: true },
+            { name: "Amoxycillin Capsules IP 500mg", price: 35.00, available: false },
+            { name: "Omeprazole Gastro-resistant Capsules IP 20mg", price: 9.90, available: true },
+            { name: "Atorvastatin Tablets IP 10mg", price: 8.80, available: true }
+        ];
+
+        // DOM Elements
+        const medicineAvailabilityTable = document.getElementById('medicineAvailabilityTable');
+        const medicineSearch = document.getElementById('medicineSearch');
+        const saveChangesBtn = document.getElementById('saveChangesBtn');
+        const saveStatus = document.getElementById('saveStatus');
+        const addNewMedicineBtn = document.getElementById('addNewMedicineBtn');
+        const addMedicineModal = document.getElementById('addMedicineModal');
+        const closeAddMedicineModal = document.getElementById('closeAddMedicineModal');
+        const cancelAddMedicine = document.getElementById('cancelAddMedicine');
+        const confirmAddMedicine = document.getElementById('confirmAddMedicine');
+        const newMedicineName = document.getElementById('newMedicineName');
+        const newMedicinePrice = document.getElementById('newMedicinePrice');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Initialize the page
+        function initPage() {
+            // Set kendra info
+            document.getElementById('kendraCode').textContent = kendraInfo.kendraCode;
+            document.getElementById('operatorName').textContent = kendraInfo.operatorName;
+            document.getElementById('operatorContact').textContent = kendraInfo.operatorContact;
+            document.getElementById('kendraAddress').textContent = kendraInfo.kendraAddress;
+            document.getElementById('kendraPinCode').textContent = kendraInfo.pinCode;
+
+            // Load medicines
+            renderMedicines(medicines);
+        }
+
+        // Render medicines to the table
+        function renderMedicines(meds) {
+            medicineAvailabilityTable.innerHTML = '';
+            
+            meds.forEach((medicine, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3">${medicine.name}</td>
+                    <td class="p-3">₹${medicine.price.toFixed(2)}</td>
+                    <td class="p-3">
+                        <select class="availability-select border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500" data-index="${index}">
+                            <option value="true" ${medicine.available ? 'selected' : ''}>Available</option>
+                            <option value="false" ${!medicine.available ? 'selected' : ''}>Not Available</option>
+                        </select>
+                    </td>
+                    <td class="p-3">
+                        <button class="remove-medicine text-red-500 hover:text-red-700 text-sm" data-index="${index}">Remove</button>
+                    </td>
+                `;
+                medicineAvailabilityTable.appendChild(row);
+            });
+
+            // Attach event listeners to the new elements
+            document.querySelectorAll('.availability-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const index = parseInt(this.dataset.index);
+                    medicines[index].available = this.value === 'true';
+                });
+            });
+
+            document.querySelectorAll('.remove-medicine').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    medicines.splice(index, 1);
+                    renderMedicines(medicines);
+                });
+            });
+        }
+
+        // Search functionality
+        medicineSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            if (searchTerm === '') {
+                renderMedicines(medicines);
+                return;
+            }
+            
+            const filtered = medicines.filter(med => 
+                med.name.toLowerCase().includes(searchTerm)
+             (renderMedicines(filtered)));
+        });
+
+        // Save changes
+        saveChangesBtn.addEventListener('click', function() {
+            // In a real app, this would send data to your backend
+            saveStatus.textContent = 'Saving changes...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                saveStatus.textContent = 'Changes saved successfully!';
+                setTimeout(() => {
+                    saveStatus.textContent = '';
+                }, 3000);
+            }, 1000);
+        });
+
+        // Add new medicine modal
+        addNewMedicineBtn.addEventListener('click', function() {
+            addMedicineModal.classList.remove('hidden');
+        });
+
+        closeAddMedicineModal.addEventListener('click', function() {
+            addMedicineModal.classList.add('hidden');
+        });
+
+        cancelAddMedicine.addEventListener('click', function() {
+            addMedicineModal.classList.add('hidden');
+        });
+
+        confirmAddMedicine.addEventListener('click', function() {
+            const name = newMedicineName.value.trim();
+            const price = parseFloat(newMedicinePrice.value);
+            const available = document.querySelector('input[name="newMedicineAvailability"]:checked').value === 'available';
+            
+            if (!name || isNaN(price)) {
+                alert('Please enter valid medicine name and price');
+                return;
+            }
+            
+            medicines.push({
+                name: name,
+                price: price,
+                available: available
+            });
+            
+            renderMedicines(medicines);
+            newMedicineName.value = '';
+            newMedicinePrice.value = '';
+            addMedicineModal.classList.add('hidden');
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', function() {
+            // In a real app, this would clear session and redirect to login
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Initialize the page when loaded
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>
